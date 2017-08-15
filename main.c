@@ -35,6 +35,26 @@ void banner(){
 }
 
 void signup(){
+    FILE *fp;
+    String tempFirst, tempLast, tempCourse, tempUser, tempPass;
+    int tempID;
+
+        printf("Enter ID Number: ");
+        scanf("%d", &tempID);
+        printf("Enter your First Name: ");
+        scanf("%s", tempFirst);
+        printf("Enter your Last Name: ");
+        scanf("%s", tempLast);
+        printf("Enter your Degree Program: ");
+        scanf("%s", tempCourse);
+        printf("Enter desired username: ");
+        scanf("%s", tempUser);
+        printf("Enter desired password: ");
+        scanf("%s", tempPass);
+
+        fp = fopen("users.txt", "a");
+        fprintf(fp, "\n%s %s %d %s %s %s 0 0", tempUser, tempPass, tempID, tempFirst, tempLast, tempCourse);
+        fclose(fp);
 }
 
 void home(){
