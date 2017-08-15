@@ -62,6 +62,74 @@ void showCourses(){
         printf("%d %d %s %d\n", allSubjects[i].courseNumber, allSubjects[i].maxSize, allSubjects[i].name, allSubjects[i].studentsEnrolled);
     }
 }
+
+void showLoggedInCourses(){
+    int i, j;
+    Boolean found = FALSE;
+    for(i=0; i<loggedInUser.enrolledCtr; i++){
+        for(j=0; j<subjCtr; j++){
+            if(loggedInUser.EnrolledCourses[i] == allSubjects[j].courseNumber)
+            {
+                found = TRUE;
+                printf("%d %d %s %d\n", allSubjects[j].courseNumber, allSubjects[j].maxSize, allSubjects[j].name, allSubjects[j].studentsEnrolled);
+                continue;
+            }
+        }
+
+    }
+    if(!found){
+        printf("No enrolled subjects\n");
+    }
+
+}
+
+void getMyCourses(){
+    int i, ctr=0, tempID, tempCrsNum;
+
+    FILE *fp;
+    fp = fopen("users'courses.txt", "r");
+
+    while(fscanf(fp, "%d %d", &tempID, &tempCrsNum)==2){
+        if(tempID == loggedInUser.id)
+        {
+            loggedInUser.EnrolledCourses[loggedInUser.enrolledCtr] = tempCrsNum;
+            loggedInUser.enrolledCtr++;
+        }
+    }
+
+
+}
+
+void dropCourse(int num){
+    int i;
+    for(i=0;i<loggedInUser.enrolledCtr; i++){
+        if(num == loggedInUser.EnrolledCourses[i]){
+            loggedInUser.EnrolledCourses[i] = 0; break;
+        }
+    }
+
+    for(i=0; i<subjCtr; i++){
+        if(num == allSubjects[i].courseNumber)
+        {
+            allSubjects[i].studentsEnrolled--;
+            printf("%s dropped!\n",allSubjects[i].name); break;
+        }
+    }
+}
+
+void showProfile(){
+    printf("You are %s %s\n", loggedInUser.firstName, loggedInUser.lastName);
+    printf("Your ID Number is %d\n", loggedInUser.id);
+    printf("You are taking up %s\n", loggedInUser.courseName);
+    printf("Your username is \n", loggedInUser.username);
+    printf("Your password is \n", loggedInUser.password);
+    printf("This term, you are taking: \n");
+    showLoggedInCourses();
+}
+
+void saveMLS(){
+    FILE *temp;
+}
 int main(){
     subjCtr = 0;
     FILE *fp;
@@ -100,11 +168,14 @@ int main(){
                                 printf("Welcome to My LaSalle! %s!\n", tempUser);
                                 strcpy(loggedInUser.courseName, tempCrs);
                                 strcpy(loggedInUser.username, tempUser);
+                                strcpy(loggedInUser.password, tempPass);
                                 loggedInUser.id = tempId;
                                 strcpy(loggedInUser.firstName, tempFirst);
                                 strcpy(loggedInUser.lastName, tempLast);
                                 loggedInUser.isAdmin = tempisAdmin;
-                                loggedInUser.enrolledCtr = tempCrsCtr;
+                                loggedInUser.enrolledCtr = 0;
+                                getMyCourses();
+                                break;
                             }
                         }
                         if(!found)
@@ -136,7 +207,7 @@ int main(){
             int tempCrs;
             switch(choice)
             {
-                case 1: showCourses(); break;
+                case 1: showCourses();break;
 
                 case 2: showCourses();
                         Boolean flag = FALSE;
@@ -151,12 +222,24 @@ int main(){
                                 loggedInUser.EnrolledCourses[loggedInUser.enrolledCtr] = tempCrs;
                                 loggedInUser.enrolledCtr++;
                                 allSubjects[i].studentsEnrolled++;
+                                break;
                             }
                         }
                         if(!flag){
                             printf("No subject with that course number has been found.\n\n");
                         }
+
                         break;
+                case 3: printf("Your classes are: \n");
+                        showLoggedInCourses();
+                        printf("Input Course Number to drop: ");
+                        scanf("%d", &tempCrs);
+                        dropCourse(tempCrs);
+
+                        break;
+                case 4: showLoggedInCourses(); break;
+                case 5: showProfile(); break;
+                case 6: saveMLS(); break;
             }
         }
     }while(1);
