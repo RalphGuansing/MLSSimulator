@@ -26,6 +26,7 @@ typedef struct user{
 
 user loggedInUser;
 subject allSubjects[1000];
+user allUsers[1000];
 
 void banner(){
 
@@ -40,6 +41,7 @@ void home(){
     printf("What would you like to do?\n");
     printf("[1] Login\n");
     printf("[2] Signup\n");
+    printf("[3] Exit MyLaSalle\n");
     printf("Choice: ");
 }
 
@@ -51,6 +53,7 @@ void loggedIn(){
     printf("[3] Drop classes\n");
     printf("[4] View my classes\n");
     printf("[5] View my profile\n");
+    printf("[6] Log Out\n");
     printf("Choice: ");
 }
 
@@ -128,7 +131,63 @@ void showProfile(){
 }
 
 void saveMLS(){
-    FILE *temp;
+    FILE *fp_mycourse, *fp_course, *fp_user;
+    int i;
+    struct user tempUSERS[1000];
+    fp_course = fopen("subjects.txt", "w");
+    fp_course = fopen("tempusers'courses.txt", "w");
+    for(i=0;i<subjCtr;i++){
+        fprintf(fp_course, "%d %d %s %d\n", allSubjects[i].courseNumber, allSubjects[i].maxSize, allSubjects[i].name, allSubjects[i].studentsEnrolled);
+    }
+
+    fclose(fp_course);
+
+
+   // fclose(fp_mycourse);
+  //  fclose(fp_user);
+
+}
+
+void showAdminMenu(){
+    printf("Welcome Admin %s %s!\n", loggedInUser.firstName, loggedInUser.lastName);
+    printf("[1] View all classes\n");
+    printf("[2] Add classes\n");
+    printf("[3] Remove Classes\n");
+    printf("[4] View class list\n");
+    printf("[5] Set class size limit\n");
+    printf("[6] View profile of students\n");
+    printf("Choice: ");
+}
+
+void addClasses(){
+    String tempName;
+    int tempMax;
+    printf("Input class name: ");
+    scanf("%s", tempName);
+    printf("Input Max Number of students: ");
+    scanf("%d", &tempMax);
+
+    allSubjects[subjCtr].courseNumber = allSubjects[subjCtr-1].courseNumber+1;
+    allSubjects[subjCtr].maxSize = tempMax;
+    allSubjects[subjCtr].studentsEnrolled = 0;
+    strcpy(allSubjects[subjCtr].name, tempName);
+    subjCtr++;
+
+    printf("Added class: %s!\n\n", tempName);
+}
+
+void removeClasses(){
+    int num, i;
+    printf("Input course number to be removed from the courses list: ");
+    scanf("%d", &num);
+    for(i=0; i<subjCtr; i++){
+        if(num == allSubjects[i].courseNumber)
+        {
+            printf("%s removed from courses!\n",allSubjects[i].name); break;
+
+        }
+    }
+    subjCtr--;
 }
 int main(){
     subjCtr = 0;
@@ -193,14 +252,16 @@ int main(){
                             }
                             printf("\n");
                             isLoggedIn = TRUE;
+                            fclose(fp);
                         }
                         break;
 
                 case 2: signup(); break;
-                case 3: break;//logout
+                case 3: printf("Thank You for using My LaSalle!");
+                    exit(0); break;
             }
         }
-        else if(isLoggedIn){
+        else if(isLoggedIn && loggedInUser.isAdmin == FALSE){
             choice = -1;
             loggedIn();
             scanf("%d", &choice);
@@ -217,6 +278,7 @@ int main(){
                         {
                             if(tempCrs == allSubjects[i].courseNumber)
                             {
+
                                 printf("Enrolled %s!\n\n", allSubjects[i].name);
                                 flag = TRUE;
                                 loggedInUser.EnrolledCourses[loggedInUser.enrolledCtr] = tempCrs;
@@ -239,10 +301,24 @@ int main(){
                         break;
                 case 4: showLoggedInCourses(); break;
                 case 5: showProfile(); break;
-                case 6: saveMLS(); break;
+                case 6: saveMLS(); break; //signout
             }
         }
+
+        else if(isLoggedIn && loggedInUser.isAdmin == TRUE)
+        {
+            choice=-1;
+            showAdminMenu();
+            scanf("%d", &choice);
+            switch(choice){
+                case 1: showCourses(); break;
+                case 2: addClasses(); break;
+                case 3: showCourses(); removeClasses(); break;
+            }
+
+        }
     }while(1);
+
 
     fclose(fp);
 }

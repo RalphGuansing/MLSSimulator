@@ -1,3 +1,2 @@
 guitarman fender 11442839 John Doe BSIT 0 0
 username password 11442840 Joe Catarata BSCS 0 0
-admin admin 11444444 Boss Malupet BSCS 1 0
