@@ -21,6 +21,7 @@ typedef struct user{
     int id;
     Boolean isAdmin;
     int EnrolledCourses[30];
+    int enrolledCtr;
 }user;
 
 user loggedInUser;
@@ -68,7 +69,7 @@ int main(){
     int choice=-1;
     int i;
     String user, pass, tempUser, tempPass,tempFirst, tempLast, tempCrs;
-    int tempId, tempisAdmin;
+    int tempId, tempisAdmin, tempCrsCtr;
     Boolean found = FALSE;
     fp = fopen("users.txt", "r");
 
@@ -91,7 +92,7 @@ int main(){
                         if (fp == NULL)
                             printf("File does not exist");
 
-                        while(fscanf(fp, "%s %s %d %s %s %s %d", tempUser, tempPass, &tempId, tempFirst, tempLast, tempCrs, &tempisAdmin) == 7)
+                        while(fscanf(fp, "%s %s %d %s %s %s %d %d", tempUser, tempPass, &tempId, tempFirst, tempLast, tempCrs, &tempisAdmin, &tempCrsCtr) == 8)
                         {
                             if(strcmp(user, tempUser) == 0 && strcmp(pass, tempPass) == 0)
                             {
@@ -103,6 +104,7 @@ int main(){
                                 strcpy(loggedInUser.firstName, tempFirst);
                                 strcpy(loggedInUser.lastName, tempLast);
                                 loggedInUser.isAdmin = tempisAdmin;
+                                loggedInUser.enrolledCtr = tempCrsCtr;
                             }
                         }
                         if(!found)
@@ -131,9 +133,30 @@ int main(){
             choice = -1;
             loggedIn();
             scanf("%d", &choice);
+            int tempCrs;
             switch(choice)
             {
-                case 1: showCourses();
+                case 1: showCourses(); break;
+
+                case 2: showCourses();
+                        Boolean flag = FALSE;
+                        printf("Input Course Number to enroll: ");
+                        scanf("%d", &tempCrs);
+                        for(i=0; i<subjCtr; i++)
+                        {
+                            if(tempCrs == allSubjects[i].courseNumber)
+                            {
+                                printf("Enrolled %s!\n\n", allSubjects[i].name);
+                                flag = TRUE;
+                                loggedInUser.EnrolledCourses[loggedInUser.enrolledCtr] = tempCrs;
+                                loggedInUser.enrolledCtr++;
+                                allSubjects[i].studentsEnrolled++;
+                            }
+                        }
+                        if(!flag){
+                            printf("No subject with that course number has been found.\n\n");
+                        }
+                        break;
             }
         }
     }while(1);
