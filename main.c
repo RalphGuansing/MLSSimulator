@@ -9,11 +9,11 @@
 typedef int Boolean;
 typedef char String[101];
 
+int subjCtr;
 
 typedef struct subject{
-    int courseNumber, maxSize;
+    int courseNumber, maxSize, studentsEnrolled;
     String name;
-    struct subject *pNext;
 } subject;
 
 typedef struct user{
@@ -24,7 +24,7 @@ typedef struct user{
 }user;
 
 user loggedInUser;
-
+subject allSubjects[1000];
 
 void banner(){
 
@@ -52,10 +52,21 @@ void loggedIn(){
     printf("[5] View my profile\n");
     printf("Choice: ");
 }
+
+void showCourses(){
+    int i;
+    printf("Per column:\n[Course Number] [Max Students] [Name] [Students Enrolled]\n");
+    for(i=0; i<subjCtr; i++)
+    {
+        printf("%d %d %s %d\n", allSubjects[i].courseNumber, allSubjects[i].maxSize, allSubjects[i].name, allSubjects[i].studentsEnrolled);
+    }
+}
 int main(){
+    subjCtr = 0;
     FILE *fp;
     Boolean isLoggedIn = FALSE;
     int choice=-1;
+    int i;
     String user, pass, tempUser, tempPass,tempFirst, tempLast, tempCrs;
     int tempId, tempisAdmin;
     Boolean found = FALSE;
@@ -96,8 +107,20 @@ int main(){
                         }
                         if(!found)
                             printf("User does not exist.\n");
-                        else
+                        else{
+                            i=0;
+                            fp = fopen("subjects.txt", "r");
+                            printf("Loading");
+                            while(fscanf(fp, "%d%d%s%d", &allSubjects[i].courseNumber, &allSubjects[i].maxSize, allSubjects[i].name, &allSubjects[i].studentsEnrolled) == 4)
+                            {
+                                if(i%10 == 0)
+                                    printf(".");
+                                i++;
+                                subjCtr++;
+                            }
+                            printf("\n");
                             isLoggedIn = TRUE;
+                        }
                         break;
 
                 case 2: signup(); break;
@@ -108,6 +131,10 @@ int main(){
             choice = -1;
             loggedIn();
             scanf("%d", &choice);
+            switch(choice)
+            {
+                case 1: showCourses();
+            }
         }
     }while(1);
 
