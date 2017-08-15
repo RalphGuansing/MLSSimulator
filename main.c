@@ -196,16 +196,33 @@ void addClasses(){
 
 void removeClasses(){
 
-    int num, i;
+    subject tempSubj[1000];
+    int num, i=0, t=0;
     printf("Input course number to be removed from the courses list: ");
     scanf("%d", &num);
+    printf("%s", allSubjects[i].name);
     for(i=0; i<subjCtr; i++){
         if(num == allSubjects[i].courseNumber)
         {
-            printf("%s removed from courses!\n",allSubjects[i].name); break;
+            printf("%s removed from courses!\n",allSubjects[i].name);
+        }
+        else{
+            tempSubj[t].courseNumber = allSubjects[i].courseNumber;
+            tempSubj[t].maxSize = allSubjects[i].maxSize;
+            tempSubj[t].studentsEnrolled = allSubjects[i].studentsEnrolled;
+            strcpy(tempSubj[t].name, allSubjects[i].name);
+            t++;
 
         }
     }
+
+    for(i=0; i<subjCtr-1; i++){
+        allSubjects[i].courseNumber = tempSubj[i].courseNumber;
+        allSubjects[i].maxSize = tempSubj[i].maxSize ;
+        allSubjects[i].studentsEnrolled = tempSubj[i].studentsEnrolled;
+        strcpy(allSubjects[i].name, tempSubj[i].name);
+    }
+
     subjCtr--;
 
 }
