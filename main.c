@@ -9,7 +9,7 @@
 typedef int Boolean;
 typedef char String[101];
 
-int subjCtr;
+int subjCtr, userCtr;
 
 typedef struct subject{
     int courseNumber, maxSize, studentsEnrolled;
@@ -87,7 +87,7 @@ void showLoggedInCourses(){
 }
 
 void getMyCourses(){
-    int i, ctr=0, tempID, tempCrsNum;
+    int i=0, ctr=0, tempID, tempCrsNum;
 
     FILE *fp;
     fp = fopen("users'courses.txt", "r");
@@ -98,7 +98,25 @@ void getMyCourses(){
             loggedInUser.EnrolledCourses[loggedInUser.enrolledCtr] = tempCrsNum;
             loggedInUser.enrolledCtr++;
         }
+          fclose(fp);
     }
+
+
+    fp = fopen("users'courses.txt", "r");
+    for(i=0; i<userCtr; i++)
+    {
+        fp = fopen("users'courses.txt", "r");
+        while(fscanf(fp, "%d %d", &tempID, &tempCrsNum)==2){
+            if(allUsers[i].id == tempID)
+            {
+                allUsers[i].EnrolledCourses[allUsers[i].enrolledCtr] = tempCrsNum;
+                allUsers[i].enrolledCtr++;
+            }
+        }
+        fclose(fp);
+    }
+
+
 
 
 }
@@ -177,6 +195,7 @@ void addClasses(){
 }
 
 void removeClasses(){
+
     int num, i;
     printf("Input course number to be removed from the courses list: ");
     scanf("%d", &num);
@@ -188,9 +207,83 @@ void removeClasses(){
         }
     }
     subjCtr--;
+
+}
+
+void showAllProfiles(){
+    int i;
+    printf("******List of all profiles******\n");
+    for(i=0; i<userCtr; i++){
+       printf("%d %s %s\n", allUsers[i].id, allUsers[i].firstName, allUsers[i].lastName);
+    }
+}
+
+void setClassSize(){
+    int tempMax, tempNum,x;
+    showCourses();
+    printf("Input class number of size you want to modify: ");
+    scanf("%d", &tempNum);
+    printf("Input modified max number of students in the said class: ");
+    scanf("%d", &tempMax);
+
+    int i;
+    for(i=0; i<subjCtr; i++){
+        if(allSubjects[i].courseNumber == tempNum){
+            x = allSubjects[i].maxSize;
+            allSubjects[i].maxSize = tempMax;
+            break;
+        }
+    }
+
+    printf("Max Size of %s has been changed from %d to %d\n", allSubjects[i].name, x, allSubjects[i].maxSize);
+
+
+
+}
+
+void viewProfile(){
+    int i, tempID;
+    showAllProfiles();
+    printf("Input ID Number of Profile you want to view: ");
+    scanf("%d", &tempID);
+        for(i=0; i<userCtr; i++)
+        {
+            if(allUsers[i].id == tempID && !allUsers[i].isAdmin)
+            {
+                printf("ID Number: %d\n", allUsers[i].id);
+                printf("First Name: %s\n", allUsers[i].firstName);
+                printf("Last Name: %s\n", allUsers[i].lastName);
+                printf("Degree Program: %s\n", allUsers[i].courseName);
+                printf("Username: %s\nPassword: %s\n\n\n", allUsers[i].username, allUsers[i].password);
+                break;
+            }
+        }
+}
+
+void viewClassList(){
+    int i, j, k, tempNum;
+    subject tempSubject;
+    showCourses();
+    printf("Input class number of class to look at its class list: ");
+    scanf("%d", &tempNum);
+    for(i=0; i<subjCtr; i++){
+        if(tempNum == allSubjects[i].courseNumber)
+            tempSubject = allSubjects[i];
+    }
+    printf("Class list for %s\n", tempSubject.name);
+    for(i=0; i<userCtr; i++){
+        for(j=0; j<allUsers[i].enrolledCtr; j++)
+        {
+            if(allUsers[i].EnrolledCourses[j] == tempSubject.courseNumber){
+                printf("%d %s %s\n", allUsers[i].id, allUsers[i].firstName, allUsers[i].lastName);
+                break;
+            }
+        }
+
+    }
 }
 int main(){
-    subjCtr = 0;
+    subjCtr = 0, userCtr = 0;
     FILE *fp;
     Boolean isLoggedIn = FALSE;
     int choice=-1;
@@ -233,9 +326,17 @@ int main(){
                                 strcpy(loggedInUser.lastName, tempLast);
                                 loggedInUser.isAdmin = tempisAdmin;
                                 loggedInUser.enrolledCtr = 0;
-                                getMyCourses();
-                                break;
                             }
+
+                            strcpy(allUsers[userCtr].courseName, tempCrs);
+                            strcpy(allUsers[userCtr].username, tempUser);
+                            strcpy(allUsers[userCtr].password, tempPass);
+                            strcpy(allUsers[userCtr].firstName, tempFirst);
+                            strcpy(allUsers[userCtr].lastName, tempLast);
+                            allUsers[userCtr].isAdmin = tempisAdmin;
+                            allUsers[userCtr].id = tempId;
+                            allUsers[userCtr].enrolledCtr = 0;
+                            userCtr++;
                         }
                         if(!found)
                             printf("User does not exist.\n");
@@ -250,10 +351,14 @@ int main(){
                                 i++;
                                 subjCtr++;
                             }
+
+                            fclose(fp);
+                            fp = fopen("users.txt", "r");
                             printf("\n");
                             isLoggedIn = TRUE;
                             fclose(fp);
                         }
+                        getMyCourses();
                         break;
 
                 case 2: signup(); break;
@@ -314,6 +419,9 @@ int main(){
                 case 1: showCourses(); break;
                 case 2: addClasses(); break;
                 case 3: showCourses(); removeClasses(); break;
+                case 4: viewClassList(); break;
+                case 5: setClassSize(); break;
+                case 6: viewProfile(); break;
             }
 
         }
