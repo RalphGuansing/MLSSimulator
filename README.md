@@ -1,6 +1,6 @@
 # MLSSimulator in C
 
-## This is a personal project of mine.
+## This is a personal project of mine done for better understanding of storing data.
 This project does a very basic simulator for an application with Register and Login.
 This basic project is to be done on the C Programming Language.
 Once logged in, Students must be able to:
